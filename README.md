@@ -11,6 +11,6 @@ A real-time notification system built with Node.js, Express, Redis pub/sub, and 
 - Backend forwards to all connected SSE clients on that topic
 
 ### API Endpoints
-POST /subscribe (user subscribes to topic)
-POST /publish (publish message to topic)
-GET /events (SSE connection)
+- POST /subscribe (user subscribes to topic)
+- POST /publish (publish message to topic)
+- GET /events (SSE connection)
