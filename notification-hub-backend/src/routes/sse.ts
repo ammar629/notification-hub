@@ -23,7 +23,6 @@ router.get("/:userId", async (req: Request, res: Response) => {
 
         // Create a Redis subscriber
         const subscriber = redisClient.duplicate();
-        await subscriber.connect();
 
         // Subscribe to all topics the user is subscribed to
         const topics = userSubscriptions.map((sub)=> `topic:${sub.topicId}`);
