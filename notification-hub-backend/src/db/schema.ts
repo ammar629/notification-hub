@@ -1,13 +1,16 @@
-// src/db/schema.ts
 import { pgTable, serial, varchar, text, timestamp, integer, boolean } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { relations, InferSelectModel, InferInsertModel } from "drizzle-orm";
+
+// ==========================================
+// TABLE DEFINITIONS
+// ==========================================
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   email: varchar("email", { length: 255 }).unique().notNull(),
   password: varchar("password", { length: 255 }).notNull(),
-  is_admin: boolean("is_admin").default(false),
-  created_at: timestamp("created_at").defaultNow(),
+  isAdmin: boolean("is_admin").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const topics = pgTable("topics", {
@@ -17,14 +20,66 @@ export const topics = pgTable("topics", {
 
 export const subscriptions = pgTable("subscriptions", {
   id: serial("id").primaryKey(),
-  user_id: integer("user_id").references(() => users.id),
-  topic_id: integer("topic_id").references(() => topics.id),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
+  topicId: integer("topic_id").references(() => topics.id, { onDelete: "cascade" }).notNull(),
 });
 
 export const messages = pgTable("messages", {
   id: serial("id").primaryKey(),
-  topic_id: integer("topic_id").references(() => topics.id),
+  topicId: integer("topic_id").references(() => topics.id, { onDelete: "cascade" }).notNull(),
   content: text("content").notNull(),
-  created_by: integer("created_by").references(() => users.id),
-  timestamp: timestamp("timestamp").defaultNow(),
+  createdBy: integer("created_by").references(() => users.id, { onDelete: "set null" }),
+  timestamp: timestamp("timestamp").defaultNow().notNull(),
 });
+
+// ==========================================
+// RELATIONS DEFINITIONS
+// ==========================================
+
+export const usersRelations = relations(users, ({ many }) => ({
+  subscriptions: many(subscriptions),
+  messages: many(messages),
+}));
+
+export const topicsRelations = relations(topics, ({ many }) => ({
+  subscriptions: many(subscriptions),
+  messages: many(messages),
+}));
+
+export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
+  user: one(users, {
+    fields: [subscriptions.userId],
+    references: [users.id],
+  }),
+  topic: one(topics, {
+    fields: [subscriptions.topicId],
+    references: [topics.id],
+  }),
+}));
+
+export const messagesRelations = relations(messages, ({ one }) => ({
+  topic: one(topics, {
+    fields: [messages.topicId],
+    references: [topics.id],
+  }),
+  author: one(users, {
+    fields: [messages.createdBy],
+    references: [users.id],
+  }),
+}));
+
+// ==========================================
+// INFERRED TYPES (EXPLICIT TYPESCRIPT)
+// ==========================================
+
+export type User = InferSelectModel<typeof users>;
+export type NewUser = InferInsertModel<typeof users>;
+
+export type Topic = InferSelectModel<typeof topics>;
+export type NewTopic = InferInsertModel<typeof topics>;
+
+export type Subscription = InferSelectModel<typeof subscriptions>;
+export type NewSubscription = InferInsertModel<typeof subscriptions>;
+
+export type Message = InferSelectModel<typeof messages>;
+export type NewMessage = InferInsertModel<typeof messages>;
