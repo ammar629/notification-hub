@@ -4,6 +4,7 @@ import cors from "cors";
 // Routes
 import authRouter from "@/routes/auth";
 import topicRouter from "@/routes/topics";
+import subscriptionRouter from "@/routes/subscriptions";
 
 const app: Express = express();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRouter);
 app.use("/api/topics", topicRouter);
+app.use("/api/subscriptions", subscriptionRouter);
 
 app.get("/health", (req: Request, res: Response) => {
   res.json({ status: "ok" }); 
