@@ -14,8 +14,14 @@ router.post("/", async(req: Request, res: Response) => {
 
         await db.insert(messages).values(newMessage);
 
-        // Publish to Redis channel
-        await redisClient.publish(`topic:${topicId}`, JSON.stringify({
+        /*
+        Non-blocking Redis publish: Fire-and-forget pattern
+        At scale, waiting for Redis would create latency.
+        DB persistence is the source of truth; Redis is for real-time subscribers.
+        If Redis fails, message is still in DB. Subscribers reconnect and catch up.
+        This decouples DB writes from real-time messaging.
+        */
+        redisClient.publish(`topic:${topicId}`, JSON.stringify({
             topicId,
             content,
             createdBy,
