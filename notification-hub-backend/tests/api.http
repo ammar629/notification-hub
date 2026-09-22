@@ -1,0 +1,81 @@
+### ============================================
+### NOTIFICATION HUB - API TEST SUITE
+### ============================================
+
+### Variables
+@baseUrl = http://localhost:3000/api
+@userId = 1
+@topicId = 1
+@email = test@example.com
+@password = password123
+
+### ============================================
+### AUTHENTICATION
+### ============================================
+
+### 1. Signup - Create new user
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "email": "{{@email}}",
+  "password": "{{@password}}"
+}
+
+### ============================================
+### TOPICS
+### ============================================
+
+### 2. Create Topic
+POST {{baseUrl}}/topics
+Content-Type: application/json
+
+{
+  "name": "sports"
+}
+
+### 3. List All Topics
+GET {{baseUrl}}/topics
+
+### ============================================
+### SUBSCRIPTIONS
+### ============================================
+
+### 4. Subscribe User to Topic
+POST {{baseUrl}}/subscriptions
+Content-Type: application/json
+
+{
+  "userId": {{@userId}},
+  "topicId": {{@topicId}}
+}
+
+### 5. Get User's Subscriptions
+GET {{baseUrl}}/subscriptions/{{@userId}}
+
+### ============================================
+### PUBLISHING & REAL-TIME
+### ============================================
+
+### 6. Publish Message to Topic
+POST {{baseUrl}}/publish
+Content-Type: application/json
+
+{
+  "topicId": {{@topicId}},
+  "content": "Hello everyone!",
+  "createdBy": {{@userId}}
+}
+
+### 7. Connect to SSE Stream (Keep open)
+GET {{baseUrl}}/events/{{@userId}}
+
+### 8. Publish Message While SSE Connected
+POST {{baseUrl}}/publish
+Content-Type: application/json
+
+{
+  "topicId": {{@topicId}},
+  "content": "Real-time test message!",
+  "createdBy": {{@userId}}
+}
