@@ -49,6 +49,7 @@ router.get("/:userId", async (req: Request, res: Response) => {
         });
 }
 catch(error){
+    console.error("SSE error:", error);
     res.status(500).json({ error: "Failed to connect" });
 }
 });
