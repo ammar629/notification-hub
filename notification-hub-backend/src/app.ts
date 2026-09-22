@@ -9,6 +9,7 @@ import publishRouter from "@/routes/publish";
 
 const app: Express = express();
 
+// TODO: Configure CORS to allow only specific origins in production
 app.use(cors());
 app.use(express.json());
 
