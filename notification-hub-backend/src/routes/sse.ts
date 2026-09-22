@@ -16,42 +16,52 @@ router.get("/:userId", async (req: Request, res: Response) => {
     res.setHeader("Connection", "keep-alive");
     // No need for CORS headers as it is handled by cors middleware in app.ts
 
-
     try{
-        // Get user's subscriptions
         const userSubscriptions = await db.select().from(subscriptions).where(eq(subscriptions.userId, parseInt(userId)));
-
-        // Create a Redis subscriber
+        console.log("User subscriptions:", userSubscriptions);
+    
         const subscriber = redisClient.duplicate();
-
-        // Subscribe to all topics the user is subscribed to
-        const topics = userSubscriptions.map((sub)=> `topic:${sub.topicId}`);
-
-        if(topics.length > 0){
-            await subscriber.subscribe(...topics);
-
-            subscriber.on("message", (channel: string, message: string) => {
-                res.write(`data: ${message}\n\n`);
-            });
-        }
-
-        // Heartbeat to keep connection alive
+        
+        // Wait for subscriber to be ready
+        subscriber.on("ready", async () => {
+            console.log("Subscriber ready");
+            
+            const topics = userSubscriptions.map((sub)=> `topic:${sub.topicId}`);
+            console.log("Topics to subscribe:", topics);
+        
+            if(topics.length > 0){
+                await subscriber.subscribe(...topics);
+                console.log("Subscribed to topics");
+            
+                subscriber.on("message", (channel: string, message: string) => {
+                    console.log("Message on", channel, ":", message);
+                    res.write(`data: ${message}\n\n`);
+                });
+            } else {
+                res.write("data: No subscriptions found\n\n");
+            }
+        });
+    
+        subscriber.on("error", (err) => {
+            console.error("Subscriber error:", err);
+            res.write(`data: Error - ${err.message}\n\n`);
+        });
+    
+        // Heartbeat
         const heartbeat = setInterval(() => {
             res.write(": heartbeat\n\n");
         }, 30000);
-
-        // Cleanup on disconnect
+    
         req.on("close", async () => {
             clearInterval(heartbeat);
-            await subscriber.unsubscribe();
             await subscriber.disconnect();
             res.end();
         });
-}
-catch(error){
-    console.error("SSE error:", error);
-    res.status(500).json({ error: "Failed to connect" });
-}
+    }
+    catch(error){
+        console.error("SSE error:", error);
+        res.status(500).json({ error: "Failed to connect" });
+    }
 });
 
 
