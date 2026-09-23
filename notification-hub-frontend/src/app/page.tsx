@@ -9,7 +9,6 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [userId, setUserId] = useState<number | null>(null);
 
     // Router
     const router = useRouter();
@@ -34,7 +33,7 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const res = await fetch('http://localhost:4000/api/auth/signup', {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }),
@@ -42,16 +41,21 @@ export default function Login() {
 
             if (!res.ok) throw new Error('Signup failed');
 
-            setUserId(1);
-            localStorage.setItem('userId', '1');
-            localStorage.setItem('email', email);
-
             const data = await res.json();
+
+            localStorage.setItem('userId', data.user.id.toString());
+            localStorage.setItem('email', data.user.email);
+
 
             alert(`${data.message}. You can now subscribe to topics and receive notifications.`);
             router.push('/dashboard');
-        } catch (err: any) {
-            setError(err.message);
+
+        } catch (err: unknown) {
+            if (err instanceof Error) {
+                setError(err.message); // ✅ Safe because TypeScript now knows it has a .message property
+            } else {
+                setError("An unexpected error occurred."); // Fallback for edge cases
+            }
         } finally {
             setLoading(false);
         }
