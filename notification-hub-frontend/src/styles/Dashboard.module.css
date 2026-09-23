@@ -1,0 +1,118 @@
+.container {
+  display: flex;
+  height: 100vh;
+  background: var(--bg-secondary);
+}
+
+.sidebar {
+  width: 250px;
+  background: var(--bg-primary);
+  border-right: 1px solid var(--border);
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.topicsList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.topicItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  font-size: 14px;
+}
+
+.topicItem button {
+  background: var(--primary);
+  color: white;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.badge {
+  color: var(--success);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+}
+
+.main h1 {
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.messagesList {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  background: var(--bg-primary);
+}
+
+.message {
+  padding: 15px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  border-left: 4px solid var(--primary);
+}
+
+.message p {
+  margin-bottom: 5px;
+  color: var(--text-primary);
+}
+
+.message small {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.empty {
+  text-align: center;
+  color: var(--text-secondary);
+  padding: 40px 0;
+}
+
+.publishForm {
+  display: flex;
+  gap: 10px;
+}
+
+.publishForm textarea {
+  flex: 1;
+  resize: none;
+  height: 60px;
+}
+
+.publishForm button {
+  background: var(--primary);
+  color: white;
+  padding: 10px 20px;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: var(--text-secondary);
+}
