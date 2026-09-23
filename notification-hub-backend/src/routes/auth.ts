@@ -30,7 +30,12 @@ router.post("/signup", async (req: Request, res: Response) => {
 
         const result = await db.insert(users).values(newUser).returning();
 
-        res.status(201).json({ message: "User created successfully" });
+        res.status(201).json({
+            message: "User created successfully", user: {
+                id: result[0].id,
+                email: result[0].email,
+            }
+        });
     }
     catch (error) {
         console.error("Signup error:", error); // Log the actual error
