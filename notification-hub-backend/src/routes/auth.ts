@@ -23,7 +23,7 @@ router.post("/signup", async (req: Request, res: Response) => {
         }
 
         const newUser: NewUser = {
-            email,
+            email: email.trim(),
             password, // TODO: Hash password with bcrypt later
             isAdmin: false,
         };
