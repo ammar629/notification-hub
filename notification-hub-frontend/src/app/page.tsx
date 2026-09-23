@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
 export default function Login() {
@@ -9,6 +10,9 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [userId, setUserId] = useState<number | null>(null);
+
+    // Router
+    const router = useRouter();
 
     const handleSignup = async () => {
         setError('');
@@ -45,6 +49,7 @@ export default function Login() {
             const data = await res.json();
 
             alert(`${data.message}. You can now subscribe to topics and receive notifications.`);
+            router.push('/dashboard');
         } catch (err: any) {
             setError(err.message);
         } finally {
