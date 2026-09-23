@@ -3,17 +3,11 @@
 import { useEffect, useState } from 'react';
 import styles from '@/styles/Dashboard.module.css';
 import { useRouter } from 'next/navigation';
+import { useSSE } from "@/hooks/useSSE";
 
 interface Topic {
     id: number;
     name: string;
-}
-
-interface Message {
-    topicId: number;
-    content: string;
-    createdBy: number;
-    timestamp: string;
 }
 
 interface SubscriptionResponse {
@@ -41,10 +35,11 @@ export default function Dashboard() {
 
     const [topics, setTopics] = useState<Topic[]>([]);
     const [subscriptions, setSubscriptions] = useState<number[]>([]);
-    const [messages, setMessages] = useState<Message[]>([]);
-    // const [newTopicName, setNewTopicName] = useState('');
     const [messageContent, setMessageContent] = useState('');
     const [loading, setLoading] = useState(true);
+
+    // Use the custom SSE hook to receive real-time messages
+    const messages = useSSE(userId, subscriptions);
 
 
     // Data Fetching Effect
@@ -75,29 +70,6 @@ export default function Dashboard() {
 
         fetchTopics();
         fetchSubscriptions();
-    }, [userId]);
-
-    // SSE Connection
-    useEffect(() => {
-        if (!userId) return;
-
-        const eventSource = new EventSource(`${process.env.NEXT_PUBLIC_API_URL}/api/events/${userId}`);
-
-        eventSource.onmessage = (event) => {
-            try {
-                const message = JSON.parse(event.data);
-                setMessages((prev) => [message, ...prev]);
-            } catch (err) {
-                console.error('Failed to parse message:', err);
-            }
-        };
-
-        eventSource.onerror = () => {
-            console.error('SSE connection error');
-            eventSource.close();
-        };
-
-        return () => eventSource.close();
     }, [userId]);
 
     const handleSubscribe = async (topicId: number) => {
