@@ -105,7 +105,7 @@ export default function Login() {
                     disabled={loading || !email.trim() || !password.trim()}
                     className={styles.button}
                 >
-                    {loading ? 'Loading...' : 'Signup & Continue'}
+                    {loading ? 'Loading...' : isLogin ? 'Login' : "Signup"}
                 </button>
             </div>
         </div>
