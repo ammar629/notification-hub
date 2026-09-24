@@ -50,7 +50,7 @@ export default function Login() {
             }
 
             // API call successful
-            localStorage.setItem("userId", data.userId);
+            localStorage.setItem("userId", data.user.id);
             localStorage.setItem("email", email);
 
             router.push("/dashboard");
