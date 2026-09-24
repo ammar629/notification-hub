@@ -58,3 +58,26 @@
   margin-bottom: 15px;
   text-align: center;
 }
+
+.toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.toggle button {
+  flex: 1;
+  padding: 10px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggle button.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
