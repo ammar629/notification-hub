@@ -42,6 +42,26 @@ export default function Dashboard() {
     const messages = useSSE(userId, subscriptions);
 
 
+    const TOPIC_COLORS = [
+        '#667eea', // primary
+        '#764ba2', // secondary
+        '#f093fb', // pink
+        '#4facfe', // blue
+        '#00f2fe', // cyan
+        '#43e97b', // green
+        '#fa709a', // red
+        '#fee140', // yellow
+    ];
+
+    const getTopicColor = (topicId: number) => {
+        return TOPIC_COLORS[topicId % TOPIC_COLORS.length];
+    };
+
+    const getTopicName = (topicId: number) => {
+        return topics.find((t) => t.id === topicId)?.name || `Topic ${topicId}`;
+    };
+
+
     // Data Fetching Effect
     useEffect(() => {
         if (!userId) return;
@@ -91,6 +111,7 @@ export default function Dashboard() {
 
     const handlePublish = async () => {
         if (!messageContent.trim() || !subscriptions[0]) return;
+        const username = localStorage.getItem("email");
 
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/publish`, {
@@ -100,6 +121,7 @@ export default function Dashboard() {
                     topicId: subscriptions[0],
                     content: messageContent,
                     createdBy: userId,
+                    username: username
                 }),
             });
 
@@ -140,14 +162,25 @@ export default function Dashboard() {
                         <p className={styles.empty}>No messages yet. Subscribe to a topic!</p>
                     ) : (
                         messages.map((msg, idx) => (
-                            <div key={idx} className={styles.message}>
+                            <div
+                                key={idx}
+                                className={styles.message}
+                                style={{ borderLeftColor: getTopicColor(msg.topicId) }}
+                            >
                                 <p>{msg.content}</p>
-                                <small>{new Date(msg.timestamp).toLocaleTimeString()}</small>
+                                <small>
+                                    <span
+                                        className={styles.topicBadge}
+                                        style={{ backgroundColor: getTopicColor(msg.topicId) }}
+                                    >
+                                        {getTopicName(msg.topicId)}
+                                    </span>
+                                    • {msg.username || `User ${msg.createdBy}`} • {new Date(msg.timestamp).toLocaleTimeString()}
+                                </small>
                             </div>
                         ))
                     )}
                 </div>
-
                 {subscriptions.length > 0 && (
                     <div className={styles.publishForm}>
                         <textarea

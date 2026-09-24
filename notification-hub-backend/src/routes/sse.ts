@@ -35,7 +35,24 @@ router.get("/:userId", async (req: Request, res: Response) => {
 
                 subscriber.on("message", (channel: string, message: string) => {
                     console.log("Message on", channel, ":", message);
-                    res.write(`data: ${message}\n\n`);
+
+                    try {
+                        // Extract topicId from channel name (e.g., "topic:1" → 1)
+                        const topicId = channel.split(":")[1];
+
+                        // Add channel info to message
+                        const enrichedMessage = {
+                            ...JSON.parse(message),
+                            topicId: parseInt(topicId),
+                            channel: channel
+                        };
+
+                        res.write(`data: ${JSON.stringify(enrichedMessage)}\n\n`);
+                    } catch (err: unknown) {
+                        if (err instanceof Error) {
+                            console.error("Failed to parse message:", err.message);
+                        }
+                    }
                 });
             } else {
                 console.log("data: No subscriptions found\n\n");

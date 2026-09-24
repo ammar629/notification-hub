@@ -6,6 +6,7 @@ interface Message {
     content: string;
     createdBy: number;
     timestamp: string;
+    username: string;
 }
 
 export function useSSE(userId: number | null, subscriptions: number[]) {

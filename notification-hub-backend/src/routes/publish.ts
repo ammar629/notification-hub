@@ -1,16 +1,16 @@
-import {Router, Request, Response} from "express";
-import {db} from "@/db";
-import {messages, NewMessage} from "@/db/schema";
+import { Router, Request, Response } from "express";
+import { db } from "@/db";
+import { messages, NewMessage } from "@/db/schema";
 import redisClient from "@/lib/redis";
 
 
 const router: Router = Router();
 
 // POST /publish - Publish message to topic
-router.post("/", async(req: Request, res: Response) => {
-    try{
-        const {topicId, content, createdBy} = req.body;
-        const newMessage: NewMessage = {topicId, content, createdBy};
+router.post("/", async (req: Request, res: Response) => {
+    try {
+        const { topicId, content, createdBy, username } = req.body;
+        const newMessage: NewMessage = { topicId, content, createdBy };
 
         await db.insert(messages).values(newMessage);
 
@@ -26,12 +26,13 @@ router.post("/", async(req: Request, res: Response) => {
             content,
             createdBy,
             timestamp: new Date(),
+            username: username,
         }));
 
-        res.status(201).json({message: "Message Published Successfully."});
+        res.status(201).json({ message: "Message Published Successfully." });
     }
-    catch(error){
-        res.status(400).json({ error: "Failed to Publish Message."});
+    catch (error) {
+        res.status(400).json({ error: "Failed to Publish Message." });
     }
 });
 
