@@ -37,6 +37,7 @@ export default function Dashboard() {
     const [subscriptions, setSubscriptions] = useState<number[]>([]);
     const [messageContent, setMessageContent] = useState('');
     const [loading, setLoading] = useState(true);
+    const [selectedTopic, setSelectedTopic] = useState<number | null>(null);
 
     // Use the custom SSE hook to receive real-time messages
     const messages = useSSE(userId, subscriptions);
@@ -60,6 +61,19 @@ export default function Dashboard() {
     const getTopicName = (topicId: number) => {
         return topics.find((t) => t.id === topicId)?.name || `Topic ${topicId}`;
     };
+
+
+    // Set Default Topic when subscriptions load
+    useEffect(() => {
+        if (subscriptions.length > 0 && !selectedTopic) {
+            const setCurrTopic = async () => {
+                setSelectedTopic(subscriptions[0]);
+            }
+
+            setCurrTopic();
+
+        }
+    }, [subscriptions, selectedTopic]);
 
 
     // Data Fetching Effect
@@ -110,7 +124,9 @@ export default function Dashboard() {
     };
 
     const handlePublish = async () => {
-        if (!messageContent.trim() || !subscriptions[0]) return;
+        if (!messageContent.trim() || !subscriptions[0] || !selectedTopic) {
+            return;
+        }
         const username = localStorage.getItem("email");
 
         try {
@@ -118,7 +134,7 @@ export default function Dashboard() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    topicId: subscriptions[0],
+                    topicId: selectedTopic,
                     content: messageContent,
                     createdBy: userId,
                     username: username
@@ -183,6 +199,16 @@ export default function Dashboard() {
                 </div>
                 {subscriptions.length > 0 && (
                     <div className={styles.publishForm}>
+                        <select
+                            value={selectedTopic || ''}
+                            onChange={(e) => setSelectedTopic(parseInt(e.target.value))}
+                            className={styles.topicSelect}>
+                            {subscriptions.map((topicId) => (
+                                <option key={topicId} value={topicId}>
+                                    {getTopicName(topicId)}
+                                </option>
+                            ))}
+                        </select>
                         <textarea
                             value={messageContent}
                             onChange={(e) => setMessageContent(e.target.value)}

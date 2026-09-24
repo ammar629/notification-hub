@@ -126,3 +126,11 @@
   height: 100vh;
   color: var(--text-secondary);
 }
+
+.topicSelect {
+  padding: 10px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+}
